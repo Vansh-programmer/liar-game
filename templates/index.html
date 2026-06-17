@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liar Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <main class="app-shell">
+        <section id="home-screen" class="screen home-screen">
+            <div class="brand-panel">
+                <p class="eyebrow">Real-time party deduction</p>
+                <h1>Liar Game</h1>
+                <p class="intro">Create a room, share the code, and find the one player bluffing through every clue.</p>
+            </div>
+
+            <div class="entry-panel">
+                <label for="player-name">Display name</label>
+                <input id="player-name" maxlength="24" placeholder="Your name" autocomplete="name">
+
+                <button id="create-room-button" class="primary-button">Create room</button>
+
+                <div class="divider"><span>or</span></div>
+
+                <label for="room-code">Room code</label>
+                <input id="room-code" maxlength="5" placeholder="ABCDE" autocapitalize="characters">
+                <button id="join-room-button" class="secondary-button">Join room</button>
+            </div>
+        </section>
+
+        <section id="game-screen" class="screen game-screen hidden">
+            <header class="game-header">
+                <div>
+                    <p class="eyebrow">Room <button id="copy-code-button" class="copy-code" title="Copy room code"></button></p>
+                    <h2 id="room-code-title">-----</h2>
+                </div>
+                <div class="round-pill" id="round-label">Lobby</div>
+            </header>
+
+            <div class="game-layout">
+                <aside class="sidebar">
+                    <div class="panel-heading">
+                        <h3>Players</h3>
+                        <span id="player-count">0/12</span>
+                    </div>
+                    <ul id="player-list" class="player-list"></ul>
+                </aside>
+
+                <section class="stage">
+                    <div id="status-card" class="status-card"></div>
+
+                    <div id="lobby-view" class="phase-view">
+                        <h3>Lobby</h3>
+                        <p id="lobby-message">Waiting for players...</p>
+                        <button id="start-game-button" class="primary-button hidden">Start game</button>
+                    </div>
+
+                    <div id="clue-view" class="phase-view hidden">
+                        <div class="secret-panel">
+                            <span>Your prompt</span>
+                            <strong id="secret-word">Waiting...</strong>
+                        </div>
+                        <div class="turn-panel">
+                            <p id="turn-message"></p>
+                            <div id="clue-form" class="clue-form hidden">
+                                <input id="clue-input" maxlength="80" placeholder="Give a clue">
+                                <button id="submit-clue-button" class="primary-button">Submit clue</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3>Clues</h3>
+                            <ul id="clue-list" class="clue-list"></ul>
+                        </div>
+                    </div>
+
+                    <div id="voting-view" class="phase-view hidden">
+                        <h3>Vote for the Liar</h3>
+                        <p>Choose carefully. You cannot vote for yourself.</p>
+                        <div id="vote-options" class="vote-options"></div>
+                    </div>
+
+                    <div id="results-view" class="phase-view hidden">
+                        <h3>Reveal</h3>
+                        <div id="results-summary" class="results-summary"></div>
+                        <div id="vote-results" class="vote-results"></div>
+                        <button id="play-again-button" class="primary-button hidden">Play again</button>
+                    </div>
+                </section>
+
+                <aside class="sidebar scoreboard">
+                    <div class="panel-heading">
+                        <h3>Scoreboard</h3>
+                    </div>
+                    <ol id="scoreboard-list" class="scoreboard-list"></ol>
+                </aside>
+            </div>
+        </section>
+
+        <div id="toast" class="toast hidden"></div>
+    </main>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
