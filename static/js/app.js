@@ -1,4 +1,7 @@
-const socket = io();
+const socket = io({
+    reconnectionAttempts: 5,
+    timeout: 10000,
+});
 
 const state = {
     room: null,
@@ -258,10 +261,19 @@ function getName() {
 }
 
 $("#create-room-button").addEventListener("click", () => {
+    if (!socket.connected) {
+        showToast("Still connecting to the game server. Try again in a moment.");
+        return;
+    }
     socket.emit("create_room", { name: getName() });
 });
 
 $("#join-room-button").addEventListener("click", () => {
+    if (!socket.connected) {
+        showToast("Still connecting to the game server. Try again in a moment.");
+        return;
+    }
+
     const roomCode = $("#room-code").value.trim().toUpperCase();
     if (!roomCode) {
         showToast("Enter a room code.");
@@ -322,6 +334,7 @@ socket.on("error_message", ({ message }) => {
 });
 
 socket.on("connect", () => {
+    showToast("Connected to the game server.");
     if (state.roomCode && state.playerId) {
         socket.emit("join_room", {
             roomCode: state.roomCode,
@@ -329,4 +342,12 @@ socket.on("connect", () => {
             playerId: state.playerId,
         });
     }
+});
+
+socket.on("connect_error", () => {
+    showToast("Cannot connect to the game server. Check the Render logs.");
+});
+
+socket.on("disconnect", () => {
+    showToast("Disconnected from the game server. Reconnecting...");
 });

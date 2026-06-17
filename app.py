@@ -5,13 +5,13 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 
 MIN_PLAYERS = 3
@@ -224,6 +224,16 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/healthz")
+def healthz():
+    return jsonify({"ok": True, "rooms": len(rooms)})
+
+
+@socketio.on("connect")
+def handle_connect():
+    app.logger.info("Socket connected: %s", request.sid)
+
+
 @socketio.on("create_room")
 def create_room(data):
     name = clean_name(data.get("name"))
@@ -235,6 +245,7 @@ def create_room(data):
     player_room_by_sid[request.sid] = room_code
     player_id_by_sid[request.sid] = player_id
     join_room(room_code)
+    app.logger.info("Room %s created by %s (%s)", room_code, name, request.sid)
     emit("room_joined", {"roomCode": room_code, "playerId": player_id})
     emit_room_state(room)
 
@@ -410,6 +421,7 @@ def handle_disconnect():
         return
 
     player.connected = False
+    app.logger.info("Socket disconnected: %s", request.sid)
     assign_new_host(room)
 
     if room.phase == "clue" and room.turn_order and room.current_turn_index < len(room.turn_order):
