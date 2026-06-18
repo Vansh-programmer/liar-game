@@ -55,6 +55,7 @@ def main():
 
     assert clue_count == 3
     assert states[0]["phase"] == "voting"
+    assert all(player["clue"] for player in states[0]["players"] if player["connected"])
 
     for index, client in enumerate(clients):
         state = states[index]

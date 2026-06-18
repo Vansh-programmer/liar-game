@@ -143,8 +143,12 @@ function renderLobby() {
     startButton.disabled = count < state.room.minPlayers;
 }
 
-function renderClues() {
-    const list = $("#clue-list");
+function renderClues(selector = "#clue-list") {
+    const list = $(selector);
+    if (!list) {
+        return;
+    }
+
     list.innerHTML = "";
 
     state.room.players
@@ -241,7 +245,7 @@ function renderRoom() {
         renderCluePhase();
     } else if (state.room.phase === "voting") {
         renderVoting();
-        renderClues();
+        renderClues("#voting-clue-list");
     } else if (state.room.phase === "results") {
         renderResults();
     }
